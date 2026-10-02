@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" data-vibe="normal">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#a78bfa" />
+  <title>SLAP. — slap your to-do list</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="live" class="sr-only" aria-live="polite"></div>
+
+  <header class="app-head">
+    <div class="app-head-row">
+      <div>
+        <h1 class="logo">SLAP<span>.</span></h1>
+        <p id="barSub" class="bar-sub">today's moves</p>
+      </div>
+      <button id="btnSettings" class="icon-btn" aria-label="Open settings">⚙️</button>
+    </div>
+    <div class="chips">
+      <span id="chipStreak" class="chip">🔥 <b data-x>0</b></span>
+      <span id="chipXp" class="chip">⭐ <b data-x>0</b> XP</span>
+      <span id="chipLevel" class="chip">🏆 LVL 1</span>
+      <span class="chip grow">📅 Day <b id="dayNum">1</b></span>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ TASKS ============ -->
+    <section id="view-tasks" class="view is-active">
+      <h2 id="greeting" class="greeting">morning. pick the easiest one ☀️</h2>
+
+      <div class="stat-grid">
+        <div class="stat"><b id="statStreak">0</b><small>day streak</small></div>
+        <div class="stat"><b id="statXp">0</b><small>total XP</small></div>
+        <div class="stat"><b id="statDone">0/0</b><small>done today</small></div>
+        <div class="stat"><b id="statMin">0m</b><small>focused</small></div>
+      </div>
+
+      <div class="rank-card">
+        <div class="rank-row"><b>Rank:</b> <span id="rankName">Procrastinator</span></div>
+        <div class="xpbar"><i id="xpFill"></i></div>
+        <small id="xpToNext">150 XP to Momentum Rookie</small>
+      </div>
+
+      <div class="energy" id="energyRow" role="group" aria-label="Energy level">
+        <button type="button" data-energy="flat">🪫 flat</button>
+        <button type="button" data-energy="ok" class="on">🙂 steady</button>
+        <button type="button" data-energy="fired">🔥 full send</button>
+      </div>
+
+      <div id="upnext" class="upnext" role="button" tabindex="0">
+        <small>UP NEXT</small>
+        <b id="upNextTitle">Add something first</b>
+        <span id="upNextWhy">Type a task below and I will pick the best one.</span>
+      </div>
+
+      <form id="addForm" class="addform">
+        <input id="addInput" type="text" placeholder="What's the thing you're avoiding?" maxlength="90" autocomplete="off" />
+        <button class="btn" type="submit">Add</button>
+      </form>
+      <div class="quick">
+        <button type="button" data-quick="Clean my room">🧹 room</button>
+        <button type="button" data-quick="Study for maths exam">📐 maths</button>
+        <button type="button" data-quick="Gym session">💪 gym</button>
+        <button type="button" data-quick="Wash the dishes">🍽️ dishes</button>
+        <button type="button" data-quick="Finish history essay">✍️ essay</button>
+      </div>
+
+      <div class="list-head"><h3>List</h3><span id="listCount"></span></div>
+      <div id="taskList"></div>
+
+      <div class="quote-card" id="quoteCard">
+        <div class="quote-track" id="quoteTrack"></div>
+        <div class="quote-dots" id="quoteDots"></div>
+      </div>
+    </section>
+
+    <!-- ============ FOCUS ============ -->
+    <section id="view-focus" class="view">
+      <h2 class="greeting">lock in <span class="chip" style="font-size:.8rem">🎯 <b id="focusCount">0</b> sessions</span></h2>
+
+      <div class="seg" id="focusSeg" role="group" aria-label="Focus panel">
+        <button type="button" data-panel="timer" class="on">⏱ Timer</button>
+        <button type="button" data-panel="study">📚 Study</button>
+      </div>
+
+      <div id="panel-timer" class="panel is-active">
+        <div class="dial-wrap">
+          <svg id="dial" viewBox="0 0 232 232">
+            <circle class="ring-bg" cx="116" cy="116" r="104" />
+            <circle id="ring" cx="116" cy="116" r="104" />
+            <text id="timeText" x="116" y="122" text-anchor="middle">15:00</text>
+          </svg>
+          <p id="modeText" class="mode-text">focus block ready</p>
+        </div>
+
+        <div id="pomoPips" class="pips"></div>
+
+        <div class="seg" id="phaseSeg" role="group" aria-label="Phase">
+          <button type="button" data-phase="work" class="on">Focus</button>
+          <button type="button" data-phase="short">Short</button>
+          <button type="button" data-phase="long">Long</button>
+        </div>
+
+        <div class="btn-row">
+          <button id="btnStart" class="btn big" type="button"><span id="startLabel">Start focus</span></button>
+          <button id="btnSkip" class="btn btn-ghost" type="button">Skip</button>
+          <button id="btnReset" class="btn btn-ghost" type="button">Reset</button>
+        </div>
+
+        <div class="seg" id="lenSeg" role="group" aria-label="Focus length">
+          <button type="button" data-min="5">5m</button>
+          <button type="button" data-min="15" class="on">15m</button>
+          <button type="button" data-min="25">25m</button>
+          <button type="button" data-min="45">45m</button>
+        </div>
+
+        <div class="seg" id="brkSeg" role="group" aria-label="Break length">
+          <button type="button" data-brk="3">3m break</button>
+          <button type="button" data-brk="5" class="on">5m break</button>
+          <button type="button" data-brk="10">10m break</button>
+        </div>
+
+        <div class="switch-row">
+          <span>Auto-start next phase</span>
+          <button id="swAuto" class="switch on" role="switch" aria-checked="true" aria-label="Auto-start next phase"></button>
+        </div>
+        <div class="switch-row">
+          <span>Chime at phase flip</span>
+          <button id="swChime" class="switch on" role="switch" aria-checked="true" aria-label="Chime"></button>
+        </div>
+
+        <label class="set-lbl" for="focusSelect">Focus task</label>
+        <select id="focusSelect" class="select"></select>
+        <div class="focus-task-card">
+          <b id="focusTaskName">Nothing selected</b>
+          <small id="focusTaskHint">Pick something above, or tap 🎯 focus on a task.</small>
+          <div id="focusSteps"></div>
+        </div>
+
+        <div class="list-head"><h3>Today</h3><span id="pomoToday"></span></div>
+        <div id="sessionLog"></div>
+
+        <h3 class="set-lbl">Parking lot</h3>
+        <form id="parkForm" class="parkform">
+          <input id="parkInput" type="text" placeholder="Stray thought during focus… park it" maxlength="70" />
+          <button class="btn btn-ghost" type="submit">Park</button>
+        </form>
+        <div id="parkList"></div>
+
+        <h3 class="set-lbl">Ambient</h3>
+        <div id="soundRow" class="pills">
+          <button type="button" class="pill on" data-sound="off">🔇 off</button>
+          <button type="button" class="pill" data-sound="rain">🌧️ rain</button>
+          <button type="button" class="pill" data-sound="waves">🌊 waves</button>
+          <button type="button" class="pill" data-sound="cafe">☕ cafe</button>
+          <button type="button" class="pill" data-sound="lofi">🎧 lofi</button>
+        </div>
+        <canvas id="viz" width="600" height="56"></canvas>
+      </div>
+
+      <div id="panel-study" class="panel">
+        <div class="seg" id="studySeg" role="group" aria-label="Study view">
+          <button type="button" data-sview="notes" class="on">📝 Notes</button>
+          <button type="button" data-sview="cards">🃏 Cards</button>
+        </div>
+
+        <button id="btnAutoSort" class="btn" type="button">🧩 Sort my list into subjects</button>
+        <div id="subjectChips" class="chips"></div>
+        <div id="subjectBoard"></div>
+
+        <div id="notesPane" class="pane is-active">
+          <form id="noteForm" class="addform col">
+            <input id="noteTitle" type="text" placeholder="Note title" maxlength="70" />
+            <textarea id="noteBody" placeholder="…" rows="3" maxlength="700"></textarea>
+            <div class="row">
+              <select id="noteSubject" class="select"><option value="auto">✨ auto-file</option></select>
+              <button class="btn" type="submit">Save</button>
+            </div>
+            <small id="noteGuess" class="guess"></small>
+          </form>
+          <div id="noteChips" class="chips"></div>
+          <div id="noteList"></div>
+        </div>
+
+        <div id="cardsPane" class="pane">
+          <form id="cardForm" class="addform col">
+            <input id="cardFront" type="text" placeholder="Front (question)" maxlength="90" />
+            <input id="cardBack" type="text" placeholder="Back (answer)" maxlength="260" />
+            <div class="row">
+              <select id="cardSubject" class="select"><option value="auto">✨ auto-file</option></select>
+              <button class="btn" type="submit">Add</button>
+            </div>
+            <small id="cardGuess" class="guess"></small>
+          </form>
+          <div class="row between">
+            <small id="dueHint"></small>
+            <button id="btnReview" class="btn" type="button">🧠 Review</button>
+          </div>
+          <div id="reviewBox" hidden></div>
+          <div id="cardChips" class="chips"></div>
+          <div id="cardList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PODS ============ -->
+    <section id="view-pods" class="view">
+      <div class="row between">
+        <h2 class="greeting">they are watching 👀</h2>
+        <button id="btnRefreshFeed" class="btn btn-ghost" type="button">refresh</button>
+      </div>
+      <div id="podBoard"></div>
+      <div id="feedList"></div>
+
+      <h3 class="set-lbl">Avatar arena</h3>
+      <div id="rivalRow" class="rival-row"></div>
+      <div class="arena">
+        <div class="arena-side me">
+          <div id="avMe"></div>
+          <b id="avMeName"></b>
+          <small id="avMeLvl"></small>
+          <div class="hp"><i id="hpMe"></i></div>
+        </div>
+        <div class="arena-vs">VS</div>
+        <div class="arena-side foe">
+          <div id="avFoe"></div>
+          <b id="avFoeName"></b>
+          <small id="avFoeLvl"></small>
+          <div class="hp"><i id="hpFoe"></i></div>
+        </div>
+      </div>
+      <p id="arenaAnn" class="arena-ann"></p>
+      <p id="arenaTip" class="arena-tip"></p>
+      <small id="arenaRecord" class="arena-rec"></small>
+      <button id="btnFight" class="btn big" type="button">⚔ Fight</button>
+    </section>
+
+    <!-- ============ REWARDS ============ -->
+    <section id="view-rewards" class="view">
+      <h2 class="greeting">your receipts 🧾</h2>
+
+      <div class="fighter-card">
+        <div id="myStage" class="my-stage"><div id="myAvatar"></div></div>
+        <div class="fighter-info">
+          <b id="ftrRank">Procrastinator</b>
+          <div>Power: <span id="ftrPower">0</span></div>
+          <div class="xpbar"><i id="ftrXpFill"></i></div>
+          <small id="ftrNext"></small>
+        </div>
+      </div>
+      <div id="fighterUnlocks" class="unlocks"></div>
+
+      <div class="stat-grid">
+        <div class="stat"><b id="rwLevel">1</b><small>level</small></div>
+        <div class="stat"><b id="rwRank">—</b><small>rank</small></div>
+        <div class="stat"><b id="rwXp">0</b><small>XP</small></div>
+        <div class="stat"><b id="rwBest">0</b><small>best streak</small></div>
+      </div>
+      <div class="rank-card">
+        <div class="xpbar"><i id="rwXpFill"></i></div>
+        <small id="rwNext"></small>
+      </div>
+
+      <h3 class="set-lbl">This week</h3>
+      <div id="streakStrip" class="streak-strip"></div>
+
+      <h3 class="set-lbl">Badges</h3>
+      <div id="badgeGrid" class="badge-grid"></div>
+
+      <h3 class="set-lbl">Hype log</h3>
+      <div id="hypeLog"></div>
+    </section>
+  </main>
+
+  <nav id="tabbar">
+    <span id="tabPill" aria-hidden="true"></span>
+    <button class="tab on" data-tab="tasks" type="button">📋<span>Tasks</span></button>
+    <button class="tab" data-tab="focus" type="button">⏱️<span>Focus</span></button>
+    <button class="tab" data-tab="pods" type="button">👥<span>Pods</span><i id="podPip" class="pip" hidden></i></button>
+    <button class="tab" data-tab="rewards" type="button">🏆<span>Rewards</span></button>
+  </nav>
+
+  <!-- hype modal -->
+  <div id="hypeScrim" class="scrim">
+    <div id="hypeSheet" class="sheet">
+      <div id="hypeOrb" class="hype-orb">🔥</div>
+      <p id="hypeMsg" class="hype-msg"></p>
+      <p id="hypeCombo" class="hype-combo"></p>
+      <small id="hypeSub" class="hype-sub"></small>
+      <div class="hype-meta">
+        <span id="mXp">+50</span>
+        <span id="mStreak">🔥 0</span>
+        <span id="mDone">0/0</span>
+      </div>
+      <div class="btn-row">
+        <button id="btnHypeAgain" class="btn btn-ghost" type="button">Again</button>
+        <button id="btnHypeClose" class="btn" type="button">Keep going</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- settings -->
+  <div id="setScrim" class="scrim">
+    <div class="sheet">
+      <div class="row between"><h3>Settings</h3><button id="btnSetClose" class="park-x" type="button">×</button></div>
+
+      <form id="nameForm" class="row">
+        <input id="nameInput" type="text" placeholder="Your name" maxlength="18" />
+        <button class="btn btn-ghost" type="submit">Save</button>
+      </form>
+
+      <h3 class="set-lbl">Coach persona</h3>
+      <div id="personaList"></div>
+
+      <h3 class="set-lbl">Accent</h3>
+      <div id="accentRow" class="swatches">
+        <button type="button" class="swatch" data-accent="violet" style="background:#a78bfa" aria-label="violet"></button>
+        <button type="button" class="swatch" data-accent="blue" style="background:#60a5fa" aria-label="blue"></button>
+        <button type="button" class="swatch" data-accent="teal" style="background:#2dd4bf" aria-label="teal"></button>
+        <button type="button" class="swatch" data-accent="lime" style="background:#a3e635" aria-label="lime"></button>
+        <button type="button" class="swatch" data-accent="amber" style="background:#fbbf24" aria-label="amber"></button>
+        <button type="button" class="swatch" data-accent="rose" style="background:#fb7185" aria-label="rose"></button>
+      </div>
+
+      <h3 class="set-lbl">Vibe</h3>
+      <div id="vibeSeg" class="seg">
+        <button type="button" data-vibe="calm">calm</button>
+        <button type="button" data-vibe="normal" class="on">normal</button>
+        <button type="button" data-vibe="loud">loud</button>
+      </div>
+
+      <h3 class="set-lbl">Interface</h3>
+      <div id="uiSeg" class="seg">
+        <button type="button" data-ui-mode="slap" class="on">SLAP</button>
+        <button type="button" data-ui-mode="prism">Prism</button>
+        <button type="button" data-ui-mode="ios">iOS</button>
+      </div>
+      <div id="iosThemeSeg" class="seg ios-only">
+        <button type="button" data-ios="light" class="on">Light</button>
+        <button type="button" data-ios="dark">Dark</button>
+      </div>
+      <small id="uiHint" class="ui-hint"></small>
+
+      <div class="switch-row"><span>Haptics</span><button id="swHaptics" class="switch on" role="switch" aria-checked="true" aria-label="Haptics"></button></div>
+      <div class="switch-row"><span>Confetti</span><button id="swConfetti" class="switch on" role="switch" aria-checked="true" aria-label="Confetti"></button></div>
+      <div class="switch-row"><span>Live pod feed</span><button id="swFeed" class="switch on" role="switch" aria-checked="true" aria-label="Live feed"></button></div>
+
+      <button id="btnWipe" class="btn btn-danger" type="button">Erase all data</button>
+    </div>
+  </div>
+
+  <!-- member sheet -->
+  <div id="memScrim" class="scrim">
+    <div class="sheet">
+      <div class="row between"><h3 id="memName">—</h3><button id="btnMemClose" class="park-x" type="button">×</button></div>
+      <div id="memAvatar" class="mem-avatar">😎</div>
+      <small id="memTag" class="mem-tag"></small>
+      <p id="memBio" class="mem-bio"></p>
+      <div id="memStats" class="mem-stats"></div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+  <script src="app.js"></script>
+</body>
+</html>
