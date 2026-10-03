@@ -1,4 +1,4 @@
-/* SLAP. — styles. Font: Outfit (nice, geometric) + JetBrains Mono for timers. */
+/* SLAP. — styles. Headings/logo/buttons: Zilla Slab (Saltz stand-in). Body: Cormorant Garamond (Katherine Stewart stand-in). */
 
 :root {
   --bg: #0b0b14;
@@ -12,18 +12,26 @@
   --acc-3: #f472b6;
   --acc-ink: #0a0612;
   --danger: #fb7185;
-  --radius: 18px;
+  --radius: 22px;
 }
+
+.ic { width: 1.1em; height: 1.1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.2em; display: inline-block; }
+.ic.big { width: 44px; height: 44px; stroke-width: 1.6; }
+
+.logo, .greeting, .btn, .logo span { font-family: 'Zilla Slab', Georgia, serif; font-weight: 600; }
 
 * { box-sizing: border-box; }
 
+button { font-family: 'Zilla Slab', Georgia, serif; }
+
 body {
   margin: 0;
-  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-family: 'Cormorant Garamond', Georgia, serif;
   background:
-    radial-gradient(1200px 600px at 80% -10%, color-mix(in srgb, var(--acc) 22%, transparent), transparent 60%),
-    radial-gradient(900px 500px at -10% 20%, color-mix(in srgb, var(--acc-3) 14%, transparent), transparent 60%),
-    var(--bg);
+    radial-gradient(1000px 500px at 85% -10%, rgba(167,139,250,.35), transparent 60%),
+    radial-gradient(800px 500px at 10% 0%, rgba(56,189,248,.22), transparent 60%),
+    radial-gradient(900px 700px at 50% 110%, rgba(244,114,182,.22), transparent 60%),
+    #08080f;
   color: var(--txt);
   min-height: 100vh;
   padding-bottom: 96px;
@@ -98,7 +106,7 @@ main { max-width: 720px; margin: 0 auto; padding: 0 18px; }
 .list-head { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; }
 .list-head h3 { margin: 0; }
 
-.task { display: flex; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; margin-top: 10px; }
+.task { display: flex; gap: 12px; background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius); padding: 14px; margin-top: 10px; backdrop-filter: blur(8px); box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 12px 30px rgba(0,0,0,.25); }
 .task.carried { border-style: dashed; }
 .task.done .task-title { text-decoration: line-through; opacity: 0.5; }
 .tick { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--muted); background: none; color: transparent; cursor: pointer; flex-shrink: 0; margin-top: 2px; }
@@ -122,7 +130,8 @@ main { max-width: 720px; margin: 0 auto; padding: 0 18px; }
 
 .task-row { position: relative; margin-top: 10px; }
 .task-row .task { margin-top: 0; }
-.swipe-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 20px; background: var(--danger); border-radius: var(--radius); color: #2a0510; font-weight: 700; }
+.swipe-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 22px; background: linear-gradient(120deg, #fb7185, #f472b6); border-radius: var(--radius); color: #fff; font-weight: 700; }
+.swipe-bg .ic { width: 20px; height: 20px; }
 .swipe-track { position: relative; transition: transform 0.2s ease; touch-action: pan-y; }
 .task-row.dragging .swipe-track { transition: none; }
 .task-bump { animation: bump 0.35s ease; }
@@ -144,7 +153,6 @@ main { max-width: 720px; margin: 0 auto; padding: 0 18px; }
 .seg { display: flex; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px; margin: 10px 0; }
 .seg button { flex: 1; background: none; border: none; color: var(--muted); border-radius: 10px; padding: 8px; cursor: pointer; font: inherit; }
 .seg button.on { background: var(--acc); color: var(--acc-ink); font-weight: 700; }
-.ios-only { display: none; }
 html[data-ui="ios"] .ios-only { display: flex; }
 
 .panel, .pane { display: none; }
@@ -163,7 +171,7 @@ html[data-ui="ios"] .ios-only { display: flex; }
 .pips i.on { background: var(--acc); }
 .pips i.now { outline: 2px solid var(--acc-2); }
 
-.btn { background: var(--acc); color: var(--acc-ink); border: none; border-radius: 14px; padding: 12px 18px; font-weight: 700; font: inherit; cursor: pointer; }
+.btn { background: var(--acc); color: var(--acc-ink); border: none; border-radius: 14px; padding: 12px 18px; font-weight: 700; font-family: 'Zilla Slab', Georgia, serif; cursor: pointer; }
 .btn.big { padding: 14px 24px; font-size: 1.05rem; }
 .btn-ghost { background: var(--card-2); color: var(--txt); border: 1px solid var(--line); }
 .btn-danger { background: var(--danger); color: #2a0510; width: 100%; margin-top: 16px; }
